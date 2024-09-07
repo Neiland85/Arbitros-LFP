@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
-const { Configuration, OpenAIApi } = require('openai');
+const { OpenAIApi, Configuration } = require('openai');  // Asegúrate de importar correctamente
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const nodemailer = require('nodemailer');
@@ -15,10 +15,10 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail', // O el servicio de correo que prefieras
+  service: 'gmail',
   auth: {
-    user: process.env.EMAIL, // Email de origen
-    pass: process.env.EMAIL_PASSWORD // Contraseña del email
+    user: process.env.EMAIL,
+    pass: process.env.EMAIL_PASSWORD
   }
 });
 
@@ -70,7 +70,7 @@ function enviarEmail(destinatario, nombreArchivo, res) {
 
 app.post('/generar-informe', async (req, res) => {
   try {
-    const { respuestas, email } = req.body; // Respuestas y el email del árbitro
+    const { respuestas, email } = req.body;
     
     let prompt = "Crea un informe oficial de un partido de fútbol bajo las normas españolas:\n";
     preguntas.forEach((pregunta, i) => {
