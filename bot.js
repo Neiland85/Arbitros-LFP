@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
-const { OpenAIApi, Configuration } = require('openai');  // Asegúrate de importar correctamente
+const { OpenAIApi, Configuration } = require('openai');  
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const nodemailer = require('nodemailer');
@@ -63,7 +63,7 @@ function enviarEmail(destinatario, nombreArchivo, res) {
     } else {
       console.log('Email enviado: ' + info.response);
       res.status(200).send('Informe enviado por email correctamente.');
-      fs.unlinkSync(nombreArchivo); // Eliminar el archivo después de enviar
+      fs.unlinkSync(nombreArchivo); 
     }
   });
 }
