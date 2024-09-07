@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
-const { OpenAIApi, Configuration } = require('openai');  
+const OpenAI = require('openai');  
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const nodemailer = require('nodemailer');
@@ -9,10 +9,9 @@ const nodemailer = require('nodemailer');
 const app = express();
 app.use(bodyParser.json());
 
-const configuration = new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-const openai = new OpenAIApi(configuration);
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -63,7 +62,7 @@ function enviarEmail(destinatario, nombreArchivo, res) {
     } else {
       console.log('Email enviado: ' + info.response);
       res.status(200).send('Informe enviado por email correctamente.');
-      fs.unlinkSync(nombreArchivo); 
+      fs.unlinkSync(nombreArchivo);
     }
   });
 }
@@ -77,13 +76,13 @@ app.post('/generar-informe', async (req, res) => {
       prompt += `${pregunta}: ${respuestas[i]}\n`;
     });
 
-    const completion = await openai.createCompletion({
+    const completion = await openai.chat.completions.create({
       model: 'gpt-4',
-      prompt: prompt,
+      messages: [{ role: 'system', content: prompt }],
       max_tokens: 500,
     });
 
-    const informe = completion.data.choices[0].text.trim();
+    const informe = completion.choices[0].message.content.trim();
     
     const nombreArchivo = `informe_${Date.now()}.pdf`;
     generarPDF(informe, nombreArchivo);
