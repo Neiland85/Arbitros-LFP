@@ -1,9 +1,10 @@
-krequire('dotenv').config();
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const { Configuration, OpenAIApi } = require('openai');
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
+const nodemailer = require('nodemailer');
 
 const app = express();
 app.use(bodyParser.json());
@@ -12,6 +13,14 @@ const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(configuration);
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail', // O el servicio de correo que prefieras
+  auth: {
+    user: process.env.EMAIL, // Email de origen
+    pass: process.env.EMAIL_PASSWORD // Contraseña del email
+  }
+});
 
 const preguntas = [
   "¿Cuál es la categoría del partido?",
@@ -33,9 +42,35 @@ function generarPDF(informe, nombreArchivo) {
   doc.end();
 }
 
+function enviarEmail(destinatario, nombreArchivo, res) {
+  const mailOptions = {
+    from: process.env.EMAIL,
+    to: destinatario,
+    subject: 'Informe del Partido de Fútbol',
+    text: 'Adjunto encontrarás el informe oficial del partido.',
+    attachments: [
+      {
+        filename: nombreArchivo,
+        path: `./${nombreArchivo}`
+      }
+    ]
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error);
+      res.status(500).send('Error enviando el email.');
+    } else {
+      console.log('Email enviado: ' + info.response);
+      res.status(200).send('Informe enviado por email correctamente.');
+      fs.unlinkSync(nombreArchivo); // Eliminar el archivo después de enviar
+    }
+  });
+}
+
 app.post('/generar-informe', async (req, res) => {
   try {
-    const respuestas = req.body.respuestas; // Lista de respuestas del árbitro
+    const { respuestas, email } = req.body; // Respuestas y el email del árbitro
     
     let prompt = "Crea un informe oficial de un partido de fútbol bajo las normas españolas:\n";
     preguntas.forEach((pregunta, i) => {
@@ -53,15 +88,7 @@ app.post('/generar-informe', async (req, res) => {
     const nombreArchivo = `informe_${Date.now()}.pdf`;
     generarPDF(informe, nombreArchivo);
 
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=${nombreArchivo}`);
-    
-    const fileStream = fs.createReadStream(nombreArchivo);
-    fileStream.pipe(res);
-
-    fileStream.on('end', () => {
-      fs.unlinkSync(nombreArchivo);
-    });
+    enviarEmail(email, nombreArchivo, res);
 
   } catch (error) {
     console.error(error);
