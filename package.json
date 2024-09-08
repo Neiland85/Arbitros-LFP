@@ -4,6 +4,7 @@
   "description": "Bot de GPT para árbitros de fútbol en España. Automatiza la creación de informes oficiales de partidos, generando documentos bajo las normativas de arbitraje español.",
   "main": "bot.js",
   "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
     "start": "node bot.js"
   },
   "keywords": [],
