@@ -1,16 +1,16 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
-const OpenAI = require('openai');  
-const PDFDocument = require('pdfkit');  
+const OpenAI = require('openai');
+const PDFDocument = require('pdfkit');
 const fs = require('fs');
-const nodemailer = require('nodemailer'); 
+const nodemailer = require('nodemailer');
 
 const app = express();
 app.use(bodyParser.json());
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,  
+  apiKey: process.env.OPENAI_API_KEY
 });
 
 const transporter = nodemailer.createTransport({
@@ -33,11 +33,9 @@ const preguntas = [
 function generarPDF(informe, nombreArchivo) {
   const doc = new PDFDocument();
   doc.pipe(fs.createWriteStream(nombreArchivo));
-
   doc.fontSize(25).text('Informe del Partido de Fútbol', { align: 'center' });
   doc.moveDown();
   doc.fontSize(12).text(informe);
-
   doc.end();
 }
 
@@ -62,7 +60,7 @@ function enviarEmail(destinatario, nombreArchivo, res) {
     } else {
       console.log('Email enviado: ' + info.response);
       res.status(200).send('Informe enviado por email correctamente.');
-      fs.unlinkSync(nombreArchivo);  // Eliminar el archivo después de enviarlo
+      fs.unlinkSync(nombreArchivo);
     }
   });
 }
@@ -90,7 +88,6 @@ app.post('/generar-informe', async (req, res) => {
     
     const nombreArchivo = `informe_${Date.now()}.pdf`;
     generarPDF(informe, nombreArchivo);
-
     enviarEmail(email, nombreArchivo, res);
 
   } catch (error) {
