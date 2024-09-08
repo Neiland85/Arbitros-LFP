@@ -1,16 +1,16 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
-const OpenAI = require('openai');  // Librería para acceder a la API de OpenAI
+const OpenAI = require('openai');  
 const PDFDocument = require('pdfkit');  
 const fs = require('fs');
-const nodemailer = require('nodemailer');  
+const nodemailer = require('nodemailer'); 
 
 const app = express();
 app.use(bodyParser.json());
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, 
+  apiKey: process.env.OPENAI_API_KEY,  
 });
 
 const transporter = nodemailer.createTransport({
