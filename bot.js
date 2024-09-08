@@ -1,16 +1,16 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
-const OpenAI = require('openai');  
-const PDFDocument = require('pdfkit');
+const OpenAI = require('openai');  // Librería para acceder a la API de OpenAI
+const PDFDocument = require('pdfkit');  
 const fs = require('fs');
-const nodemailer = require('nodemailer');
+const nodemailer = require('nodemailer');  
 
 const app = express();
 app.use(bodyParser.json());
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY, 
 });
 
 const transporter = nodemailer.createTransport({
@@ -62,15 +62,19 @@ function enviarEmail(destinatario, nombreArchivo, res) {
     } else {
       console.log('Email enviado: ' + info.response);
       res.status(200).send('Informe enviado por email correctamente.');
-      fs.unlinkSync(nombreArchivo);
+      fs.unlinkSync(nombreArchivo);  // Eliminar el archivo después de enviarlo
     }
   });
 }
 
+app.get('/', (req, res) => {
+  res.send('Servidor funcionando correctamente.');
+});
+
 app.post('/generar-informe', async (req, res) => {
   try {
     const { respuestas, email } = req.body;
-    
+
     let prompt = "Crea un informe oficial de un partido de fútbol bajo las normas españolas:\n";
     preguntas.forEach((pregunta, i) => {
       prompt += `${pregunta}: ${respuestas[i]}\n`;
