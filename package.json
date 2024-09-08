@@ -1,10 +1,10 @@
 {
   "name": "arbitros-lfp",
   "version": "1.0.0",
-  "description": "Bot de GPT para árbitros de fútbol en España. Automatiza la creación de informes oficiales de partidos, generando documentos bajo las normativas de arbitraje español.",
+  "description": "Bot de GPT para árbitros de fútbol en España. Automatiza la creación de informes oficiales de partidos, ...",
   "main": "bot.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node bot.js"
   },
   "keywords": [],
